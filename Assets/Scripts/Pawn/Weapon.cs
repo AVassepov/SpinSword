@@ -14,7 +14,7 @@ public class Weapon : MonoBehaviour
     
     
     
-    
+    Vector3 knockbackDirection;
     
     private Rigidbody2D RB;
     private WeaponUI UI;
@@ -77,6 +77,7 @@ public class Weapon : MonoBehaviour
 
 
 
+            knockbackDirection = -other.contacts[0].normal;
 
 
             if (enemyRB && !lingeringClash && (!character || character.CurrentWeapon != this))
@@ -123,10 +124,10 @@ public class Weapon : MonoBehaviour
 
 
                         print("Stabbed");
-                        if (other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                         {
                             damageable.UpdateHealth(-WeaponDamage  * bonus *
-                                                    RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY));
+                                                    RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
                             SpawnDamageCanvas(WeaponDamage  * bonus *
                                               RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY),
                                 other.transform);
@@ -140,18 +141,18 @@ public class Weapon : MonoBehaviour
                         if (Type == WeaponType.Sword)
                         {
                             print("Slashed");
-                            if (other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                            if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                             {
-                                damageable.UpdateHealth(-WeaponDamage * RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY));
+                                damageable.UpdateHealth(-WeaponDamage * RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
                                 SpawnDamageCanvas(WeaponDamage * RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY), other.transform);
                             }
                         }
                         else
                         {
                             print("Smashed");
-                            if (other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                            if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                             {
-                                damageable.UpdateHealth(-WeaponDamage * RB.mass* Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY));
+                                damageable.UpdateHealth(-WeaponDamage * RB.mass* Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
                                 SpawnDamageCanvas(WeaponDamage * RB.mass* Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY),
                                     other.transform);
                             }

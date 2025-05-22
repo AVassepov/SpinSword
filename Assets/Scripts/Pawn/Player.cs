@@ -1,15 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using NavMeshPlus.Components;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : Character
 {
      private Rigidbody2D rb2d;
-
-    public float MovementSpeed = 1f;
 
     public float SprintSpeed = 6f;
     public float Stamina = 0; 

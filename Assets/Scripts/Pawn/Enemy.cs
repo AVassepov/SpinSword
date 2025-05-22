@@ -28,12 +28,14 @@ public class Enemy : Character
         
         healthbarInstance.transform.position = gameObject.transform.position;
         
-        Vector2 weaponPosition = Vector2.Lerp( WeaponTargetTransform.position , WeaponAnchor.position , CurrentWeapon.RotationSpeed  );
-        Quaternion weaponRotation = Quaternion.Lerp(WeaponTargetTransform.rotation, WeaponAnchor.rotation, CurrentWeapon.RotationSpeed );
+        
+        if(WeaponTargetTransform){
+            Vector2 weaponPosition = Vector2.Lerp( WeaponTargetTransform.position , WeaponAnchor.position , CurrentWeapon.RotationSpeed  );
+            Quaternion weaponRotation = Quaternion.Lerp(WeaponTargetTransform.rotation, WeaponAnchor.rotation, CurrentWeapon.RotationSpeed );
 
-        WeaponTargetTransform.transform.position = weaponPosition;
-        WeaponTargetTransform.transform.rotation = weaponRotation;
-
+            WeaponTargetTransform.transform.position = weaponPosition;
+            WeaponTargetTransform.transform.rotation = weaponRotation;
+        }
     }
 
     private void Update()

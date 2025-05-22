@@ -1,9 +1,6 @@
-using System;
-using NavMeshPlus.Components;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class Character : MonoBehaviour,IDamageable
+public class Character : Pawn
 {
 
 
@@ -15,10 +12,6 @@ public class Character : MonoBehaviour,IDamageable
 
     public Transform WeaponTargetTransform;
     
-    public float Health;
-    
-    public float MaxHealth = 100f;
-
     [HideInInspector] public GameObject healthbarInstance;
     public Weapon CurrentWeapon;
   
@@ -32,8 +25,9 @@ public class Character : MonoBehaviour,IDamageable
 
     }
 
-    public void UpdateHealth(float value)
+    public override void UpdateHealth(float value , Vector3 direction)
     {
+        
         Health += value;
 
         if (Health > MaxHealth)
@@ -43,17 +37,12 @@ public class Character : MonoBehaviour,IDamageable
         {
             Die();
         }
-        
         healthBarImage.fillAmount = Health / MaxHealth;
- 
+
+        
         
     }
 
-
-    public void Die()
-    {
-        
-    }
 
     public void SetCurrentWeapon(Weapon newWeapon)
     {
@@ -62,10 +51,4 @@ public class Character : MonoBehaviour,IDamageable
     
     
     
-}
-
-
-public interface IDamageable
-{
-    void UpdateHealth(float value);
 }
