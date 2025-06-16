@@ -18,7 +18,9 @@ public class Character : Pawn
 
     public void Start()
     {
-        healthbarInstance = Instantiate(healthBar,transform); 
+        healthbarInstance = Instantiate(healthBar, transform.position, Quaternion.identity); 
+
+        Health = MaxHealth;
         
         healthBarImage = healthbarInstance.transform.GetChild(1).GetComponent<UnityEngine.UI.Image>();
         healthbarInstance.transform.parent = null;
@@ -35,6 +37,10 @@ public class Character : Pawn
             Health = MaxHealth;
         }else if (Health <= 0)
         {
+            Destroy(healthbarInstance);
+            if (CurrentWeapon) {
+                CurrentWeapon.Drop();
+            }
             Die();
         }
         healthBarImage.fillAmount = Health / MaxHealth;

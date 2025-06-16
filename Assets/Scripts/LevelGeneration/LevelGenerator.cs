@@ -42,12 +42,12 @@ public class LevelGenerator : MonoBehaviour
         Rooms.Add(starterRoom);
         
         
-        for (int i = 0; i <    starterRoom.Doors.Length; i++)
+        for (int i = 0; i <    starterRoom.Doors.Count; i++)
         {
             starterRoom.Doors[i].SetActive( Random.Range(0, 10) <= 1);   
         }
 
-        for (int i = 0; i < starterRoom.Doors.Length; i++)
+        for (int i = 0; i < starterRoom.Doors.Count; i++)
         {
 
           Vector3 anchor =  starterRoom.GetAnchor(i);
@@ -126,7 +126,7 @@ public class LevelGenerator : MonoBehaviour
             Rooms.Add(roomInstance);
             
             
-            for (int i = 0; i < roomInstance.Doors.Length; i++)
+            for (int i = 0; i < roomInstance.Doors.Count; i++)
             {
 
                 Vector3 newAnchor =  roomInstance.GetAnchor(i);

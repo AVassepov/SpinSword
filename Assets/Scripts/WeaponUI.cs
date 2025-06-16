@@ -36,7 +36,7 @@ public class WeaponUI : MonoBehaviour
       
       
       
-      UIInstance = Instantiate(UI , transform.position+ new Vector3(0,8,0) , quaternion.identity);
+      UIInstance = Instantiate(UI , transform.position+ new Vector3(0,5,0) , quaternion.identity);
 
       WeaponName = UIInstance.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
       WeaponType = UIInstance.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
@@ -49,7 +49,7 @@ public class WeaponUI : MonoBehaviour
       WeaponName.text = transform.name;
       WeaponName.text.Replace("(Clone)", "");
       WeaponType.text = weapon.Type.ToString();
-      Damage.text = weapon.WeaponDamage.ToString();
+      Damage.text = weapon.BaseWeaponDamage.ToString();
       Weight.text = GetComponentInChildren<Rigidbody2D>().mass.ToString();
       SwingSpeed.text = weapon.MovementSpeed.ToString();
       Knockback.text = weapon.KnockbackForce.ToString();

@@ -1,13 +1,23 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    
-    public GameObject[] Doors;
-    
+
+    public List<GameObject> Doors;
+
     [SerializeField] private GameObject[] Anchors;
-    
+    [SerializeField] private List<GameObject>Encounters;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private void Awake()
+    {
+
+        if(Encounters.Count > 0 && transform.name != "BaseRoom") { 
+            Encounter encounter = Instantiate(Encounters[Random.Range(0, Encounters.Count)], transform).GetComponent<Encounter>();
+            encounter.Doors = Doors;
+        }
+    }
 
 
     public Vector3 GetAnchor(int index)

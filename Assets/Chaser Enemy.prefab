@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 918579023578738558}
   - component: {fileID: 6659608001927442407}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Chaser Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,6 +188,8 @@ MonoBehaviour:
   healthbarInstance: {fileID: 0}
   CurrentWeapon: {fileID: 3493817972388725982}
   Encounter: {fileID: 0}
+  Player: {fileID: 0}
+  enemyBehaviour: 1
 --- !u!195 &6659608001927442407
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -323,6 +325,10 @@ PrefabInstance:
     - target: {fileID: 3923250128084028381, guid: 605f08a7e38a1f346840fc19715869e5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7111125622559145481, guid: 605f08a7e38a1f346840fc19715869e5, type: 3}
+      propertyPath: BaseWeaponDamage
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

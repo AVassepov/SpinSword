@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System;
 using UnityEngine;
 
@@ -11,7 +12,9 @@ public class Projectile : Pawn
     private Rigidbody2D rb;
     private LineRenderer line;
 
-    private Vector3 targetPosition;
+
+    [SerializeField] private float Damage = 10;
+    [SerializeField]private Vector3 targetPosition;
     
     private void Awake()
     {
@@ -33,7 +36,19 @@ public class Projectile : Pawn
     {
         print("RICHOCHETTING");
 
-        line.positionCount = 0;
+
+        IDamageable damageable = other.gameObject.GetComponent<IDamageable>();
+
+
+        if (damageable != null)
+        {
+            damageable.UpdateHealth(-Damage, -other.contacts[0].normal * 10);
+            Die();
+        
+        }
+
+
+            line.positionCount = 0;
         if (currentRicochets < MaxRicochets)
         {
             currentRicochets++;

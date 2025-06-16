@@ -7,11 +7,15 @@ public class Weapon : MonoBehaviour
 {
 
     public float MovementSpeed;
-    public float WeaponDamage;
+    public float BaseWeaponDamage =1;
+    public float SpeedModifier = 0.1f;
     [Range(0.01f, 1f)]
     public float RotationSpeed;
     public float KnockbackForce = 1f;
-    
+
+
+
+    //public LineRenderer LineRenderer;
     
     
     Vector3 knockbackDirection;
@@ -23,6 +27,10 @@ public class Weapon : MonoBehaviour
 
     public Transform Target;
 
+
+
+
+    private bool recovering;
     private bool clashed;
     private bool lingeringClash;
     public float RecoveryTime = 1f;
@@ -37,10 +45,16 @@ public class Weapon : MonoBehaviour
     }
     
     
-    private void Awake()
+    private void Start()
     {
         RB = GetComponent<Rigidbody2D>();
         UI = GetComponent<WeaponUI>();
+            
+        if(Target == null)
+        {
+            Drop();
+        }
+    
     }
 
     void Update()
@@ -73,8 +87,6 @@ public class Weapon : MonoBehaviour
 
             Rigidbody2D enemyRB = other.gameObject.GetComponent<Rigidbody2D>();
 
-            print(other.relativeVelocity);
-
 
 
             knockbackDirection = -other.contacts[0].normal;
@@ -85,20 +97,27 @@ public class Weapon : MonoBehaviour
                 // neutralize a bit before the big hit
 
 
-                print("Applied :" + KnockbackForce * GetVelocity(other.relativeVelocity) + "knockback force");
+                print("Applied :" + KnockbackForce * RB.linearVelocity + "knockback force");
+                Weapon weapon = other.gameObject.GetComponent<Weapon>();
 
-                if (other.gameObject.GetComponent<Weapon>() != null)
+
+                if (weapon != null)
                 {
+                    enemyRB.linearVelocity = Vector3.zero;
                     clashed = true;
                     lingeringClash = true;
                     StartCoroutine(ClashRecovery());
                     enemyRB.AddForce(
-                        -other.contacts[0].normal * KnockbackForce * RB.linearVelocity * 0.8f,
+                      (other.transform.position - transform.position).normalized * KnockbackForce * RB.linearVelocity.magnitude * 0.3f ,
                         ForceMode2D.Impulse);
+
+
+                    EffectsManager.Instance.PoolObject(EffectsManager.Instance.GetPooledObject(EffectsManager.EffectType.Spark), 1 , transform.position ,transform.rotation );
+
                 }
                 else
                 {
-                    enemyRB.AddForce(-other.contacts[0].normal * KnockbackForce * RB.linearVelocity,
+                    enemyRB.AddForce((other.transform.position - transform.position).normalized * KnockbackForce * RB.linearVelocity.magnitude,
                         ForceMode2D.Impulse);
                 }
             }
@@ -106,16 +125,19 @@ public class Weapon : MonoBehaviour
             IDamageable damageable = other.gameObject.GetComponent<IDamageable>();
 
 
-            if (damageable != null)
+            if (damageable != null && !recovering )
             {
+
+                float bonus = 1;
+                StartCoroutine(DamageRecovery());
                 if ((-other.contacts[0].normal.x + 0.2 >= transform.up.x &&
                      -other.contacts[0].normal.x - 0.2 <= transform.up.x) ||
                     (-other.contacts[0].normal.y + 0.2 >= transform.up.y &&
                      -other.contacts[0].normal.y - 0.2 <= transform.up.y))
                 {
+
                     if (Type != WeaponType.Club)
                     {
-                        float bonus = 1;
 
                         if (Type == WeaponType.Spear)
                         {
@@ -126,25 +148,38 @@ public class Weapon : MonoBehaviour
                         print("Stabbed");
                         if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                         {
-                            damageable.UpdateHealth(-WeaponDamage  * bonus *
-                                                    RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
-                            SpawnDamageCanvas(WeaponDamage  * bonus *
-                                              RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY),
+                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
+                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
+                                              RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
                                 other.transform);
                         }
                     }
                 }
                 else
                 {
-                    if (Type != WeaponType.Spear)
-                    {
                         if (Type == WeaponType.Sword)
                         {
                             print("Slashed");
                             if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                             {
-                                damageable.UpdateHealth(-WeaponDamage * RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
-                                SpawnDamageCanvas(WeaponDamage * RB.mass * Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY), other.transform);
+                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
+                                                RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection); 
+                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
+                                             RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                               other.transform);
+                            }
+                        }else  if (Type == WeaponType.Spear)
+                        {
+                            print("Spear Slashed");
+                            bonus = 0.5f;
+                            if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                            {
+                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
+                                                 RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
+                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
+                                             RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                               other.transform);
                             }
                         }
                         else
@@ -152,14 +187,14 @@ public class Weapon : MonoBehaviour
                             print("Smashed");
                             if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
                             {
-                                damageable.UpdateHealth(-WeaponDamage * RB.mass* Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY) , knockbackDirection);
-                                SpawnDamageCanvas(WeaponDamage * RB.mass* Math.Abs(RB.linearVelocityX) * Math.Abs(RB.linearVelocityY),
-                                    other.transform);
+                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
+                                                RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection); 
+                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
+                                              RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                                other.transform);
                             }
 
                         }
-
-                    }
                 }
 
 
@@ -176,17 +211,23 @@ public class Weapon : MonoBehaviour
         
         clashed = false;
         yield return new WaitForSeconds(RecoveryTime * 2);
-        
+        RB.linearVelocity = new Vector2 (-RB.linearVelocityX/2, -RB.linearVelocityY/2);
         lingeringClash = false;
         
         
     }
-    
-    private float GetVelocity(Vector2  relativeVelocity)
+
+    private IEnumerator DamageRecovery()
     {
-        return Math.Abs(relativeVelocity.x) +Math.Abs(relativeVelocity.y);
+
+        recovering = true;
+        yield return new WaitForSeconds(0.1f);
+
+        recovering = false;
+
+
     }
-    
+
     
 
     private void SpawnDamageCanvas(float damage , Transform parent)
