@@ -38,12 +38,14 @@ public class WeaponUI : MonoBehaviour
       
       UIInstance = Instantiate(UI , transform.position+ new Vector3(0,5,0) , quaternion.identity);
 
-      WeaponName = UIInstance.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-      WeaponType = UIInstance.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-      Damage = UIInstance.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-      Weight = UIInstance.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-      SwingSpeed = UIInstance.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-      Knockback = UIInstance.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
+        Transform UIChild = UIInstance.transform.GetChild(0);
+
+      WeaponName = UIChild.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+      WeaponType = UIChild.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+      Damage = UIChild.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+      Weight = UIChild.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+      SwingSpeed = UIChild.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+      Knockback = UIChild.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
 
 
       WeaponName.text = transform.name;
@@ -66,4 +68,6 @@ public class WeaponUI : MonoBehaviour
    {
       CloseUI();
    }
+
+
 }

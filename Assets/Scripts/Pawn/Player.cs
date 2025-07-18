@@ -1,3 +1,6 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : Character
@@ -16,12 +19,24 @@ public class Player : Character
     private float defaultSpeed;
 
 
+    public List<Weapon> EquippedWeapons = new List<Weapon>();
+
+    private int MaximumWeaponSlots = 3;
+
+
+
     private Weapon weaponOnGround;
     private void Awake()
     {
         rb2d = GetComponent<Rigidbody2D>();
         Stamina = maxStamina;
         defaultSpeed = MovementSpeed;
+
+
+        for (int i = 0; i < EquippedWeapons.Count; i++)
+        {
+            EquippedWeapons[i].ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+        }
     }
 
 
@@ -46,10 +61,45 @@ public class Player : Character
         {
             Interact();
         }
-        
-        
+
+        int number = GetPressedNumber();
+
+        if (number > 0) {
+            SwapWeapon(number-1);
+        }
+
+        if(Input.GetAxis("Mouse ScrollWheel") != 0)
+        {
+          int newWeapon = EquippedWeapons.IndexOf(CurrentWeapon) + (int)Input.GetAxis("Mouse ScrollWheel");
+
+
+            if (newWeapon < 0)
+            {
+                newWeapon = EquippedWeapons.Count;
+            }
+            else if (newWeapon > EquippedWeapons.Count) 
+            {
+                newWeapon = 0;    
+            }
+
+                SwapWeapon(newWeapon);
+        }
+
+
+
         healthbarInstance.transform.position = gameObject.transform.position;
         
+    }
+
+    public int GetPressedNumber()
+    {
+        for (int number = 0; number <= 9; number++)
+        {
+            if (Input.GetKeyDown(number.ToString()))
+                return number;
+        }
+
+        return -1;
     }
 
     private void Move(Vector2 moveDirection)
@@ -78,6 +128,21 @@ public class Player : Character
 
           // rb2d.linearVelocity = moveDirection * MovementSpeed;
             rb2d.AddForce(moveDirection * MovementSpeed , ForceMode2D.Force);
+    }
+
+    private void SwapWeapon(int weaponIndex)
+    {
+        CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+        CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+        CurrentWeapon.gameObject.SetActive(false);
+        CurrentWeapon = EquippedWeapons[weaponIndex];
+        CurrentWeapon.gameObject.SetActive(true);
+        CurrentWeapon.transform.position = WeaponAnchor.transform.position;
+        CurrentWeapon.Target = WeaponTargetTransform;
+        CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+        CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+
+        CurrentWeapon.ActivateAllEffects( PassiveEffect.ActivationCondition.Constant);
     }
 
 
@@ -134,11 +199,28 @@ public class Player : Character
 
         if (weaponOnGround)
         {
-            print("Tried to pickup");
-            CurrentWeapon.Drop();
-            CurrentWeapon = weaponOnGround;
-            weaponOnGround.PickUp(WeaponAnchor);
-            weaponOnGround = null;
+
+            if (MaximumWeaponSlots > EquippedWeapons.Count)
+            {
+                weaponOnGround.PickUp(WeaponAnchor);
+                EquippedWeapons.Add(weaponOnGround);
+                SwapWeapon(EquippedWeapons.IndexOf(weaponOnGround));
+                weaponOnGround = null;
+            }
+            else
+            {
+                print("Tried to pickup");
+                CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.WhileEquiped);
+                CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.Constant);
+                CurrentWeapon.Drop();
+                CurrentWeapon = weaponOnGround;
+                weaponOnGround.PickUp(WeaponAnchor);
+                weaponOnGround = null;
+                CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+                CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+
+
+            }
         }
         
     }

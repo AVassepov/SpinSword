@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectsManager : MonoBehaviour
+public class FXManager : MonoBehaviour
 {
 
 
@@ -14,7 +14,7 @@ public class EffectsManager : MonoBehaviour
     //Instances of Objects
     private List<GameObject> SparkVFXInstances = new List<GameObject>();
 
-    public static EffectsManager Instance { get; private set; }
+    public static FXManager Instance { get; private set; }
 
 
 

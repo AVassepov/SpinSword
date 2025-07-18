@@ -43,6 +43,7 @@ public class Projectile : Pawn
         if (damageable != null)
         {
             damageable.UpdateHealth(-Damage, -other.contacts[0].normal * 10);
+            other.rigidbody.AddForce(rb.linearVelocity,ForceMode2D.Impulse);
             Die();
         
         }

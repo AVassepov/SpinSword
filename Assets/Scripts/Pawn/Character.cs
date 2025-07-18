@@ -4,11 +4,14 @@ public class Character : Pawn
 {
 
 
+    public BonusEffect BonusEffect;
+
     [SerializeField] private GameObject healthBar;
     private UnityEngine.UI.Image healthBarImage;
     
     
     public Transform WeaponAnchor;
+
 
     public Transform WeaponTargetTransform;
     
@@ -24,6 +27,12 @@ public class Character : Pawn
         
         healthBarImage = healthbarInstance.transform.GetChild(1).GetComponent<UnityEngine.UI.Image>();
         healthbarInstance.transform.parent = null;
+
+        if(CurrentWeapon != null)
+        {
+            CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+            CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+        }
 
     }
 
@@ -49,12 +58,23 @@ public class Character : Pawn
         
     }
 
+    
+    
+    
+}
 
-    public void SetCurrentWeapon(Weapon newWeapon)
-    {
-        CurrentWeapon = null;
-    }
-    
-    
-    
+[System.Serializable]
+public class BonusEffect
+{
+    public float WeaponSize;
+    public float BaseDamage;
+    public float DamageSpeedMult = 1;
+    public float BonusDuration;
+    public float SwingSpeed;
+    public float MovementSpeed;
+    public float MaxHP;
+    public float Stamina;
+    public float CoolDown;
+    public float ApplyPoison;
+    public float ApplyBleed;
 }
