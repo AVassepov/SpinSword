@@ -14,7 +14,7 @@ public class Projectile : Pawn
 
 
     [SerializeField] private float Damage = 10;
-    [SerializeField]private Vector3 targetPosition;
+    public Vector3 TargetPosition;
     
     private void Awake()
     {
@@ -26,9 +26,9 @@ public class Projectile : Pawn
     private void Update()
     {
 
-        if (targetPosition != Vector3.zero)
+        if (TargetPosition != Vector3.zero)
         {
-            rb.linearVelocity = targetPosition * 10;
+            rb.linearVelocity = TargetPosition * 10;
         }
     }
 
@@ -54,7 +54,7 @@ public class Projectile : Pawn
         {
             currentRicochets++;
 
-            targetPosition = other.contacts[0].normal;
+            TargetPosition = other.contacts[0].normal;
             line.positionCount = 2;
             line.SetPosition(0, transform.position);
             line.SetPosition(1 , other.contacts[0].normal*1000);
@@ -65,7 +65,6 @@ public class Projectile : Pawn
             Die();
         }  
     }
-
 
     public override void TakeHit(Vector3 direction)
     {

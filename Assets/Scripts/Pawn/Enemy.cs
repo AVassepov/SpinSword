@@ -14,6 +14,7 @@ public class Enemy : Character
 
     [SerializeField]private Behaviour enemyBehaviour;
 
+    [SerializeField] private GameObject ProjectilePrefab;
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -29,9 +30,9 @@ public class Enemy : Character
           WeaponAnchor.transform.parent = null;
           Weapon.transform.parent = null;
           }*/
-        CurrentWeapon.Target = WeaponTargetTransform;
-        WeaponTargetTransform.transform.parent = null;
-        CurrentWeapon.transform.parent = null;
+        WeaponElements.CurrentWeapon.Target = WeaponElements.WeaponTargetTransform;
+        WeaponElements.WeaponTargetTransform.transform.parent = null;
+        WeaponElements.CurrentWeapon.transform.parent = null;
     }
 
 
@@ -53,12 +54,12 @@ public class Enemy : Character
         healthbarInstance.transform.position = gameObject.transform.position;
         
         
-        if(WeaponTargetTransform){
-            Vector2 weaponPosition = Vector2.Lerp( WeaponTargetTransform.position , WeaponAnchor.position , CurrentWeapon.RotationSpeed  );
-            Quaternion weaponRotation = Quaternion.Lerp(WeaponTargetTransform.rotation, WeaponAnchor.rotation, CurrentWeapon.RotationSpeed );
+        if(WeaponElements.WeaponTargetTransform){
+            Vector2 weaponPosition = Vector2.Lerp(WeaponElements.WeaponTargetTransform.position , WeaponElements.WeaponAnchor.position , WeaponElements.CurrentWeapon.RotationSpeed  );
+            Quaternion weaponRotation = Quaternion.Lerp(WeaponElements.WeaponTargetTransform.rotation, WeaponElements.WeaponAnchor.rotation, WeaponElements.CurrentWeapon.RotationSpeed );
 
-            WeaponTargetTransform.transform.position = weaponPosition;
-            WeaponTargetTransform.transform.rotation = weaponRotation;
+            WeaponElements.WeaponTargetTransform.transform.position = weaponPosition;
+            WeaponElements.WeaponTargetTransform.transform.rotation = weaponRotation;
         }
     }
     public override void Die()
@@ -70,16 +71,18 @@ public class Enemy : Character
         Destroy(gameObject);
     }
 
-    private void Update()
+    
+    public void ShootProjectile(Vector3 dir, float damage, Vector3 origin, float velocity, int projectileLives)
     {
-        
-        //agent.SetDestination(new Vector3(0, 0, 1));
+
+        Projectile projectile = Instantiate(ProjectilePrefab , origin, Quaternion.identity).GetComponent<Projectile>();
+
+
+
     }
 
-
-
     /// <summary>
-    ///  1) Stand Still and spin around
+    ///  1)Stand Still and spin around
     ///  2)Run to player at all times
     ///  3)run at player, when weapon hits the player retreat, weapon doesnt spin and points at player
     ///  4)Stands back and tries to keep a certain distance away, shoots projectiles
@@ -87,7 +90,8 @@ public class Enemy : Character
     ///  6)Run to a random position in sight, if player is near the path take a detour to hit them
     ///  7)Run to a random position in room , detour to take a hit while near 
     ///  8)Wander to random position in room, when spots the enemy switches to Chaser Behaviour
-    ///  9) Walk between 2-3 preditermined locations.
+    ///  9)Walk between 2-3 preditermined locations.
+    ///  10)Moves and rotates from one point to another relative to a point
     /// </summary>
     public enum Behaviour
     {
@@ -98,7 +102,8 @@ public class Enemy : Character
         Stalker,
         Blind,
         Wanderer,
-        Patroller
+        Patroller,
+        Swinger
 
     }
     

@@ -38,14 +38,14 @@ public class Weapon : MonoBehaviour
 
     public Character Owner;
     [SerializeField] private GameObject damageCanvas;
-    public enum WeaponType
+    public enum WeaponType : byte
     {
         Sword,
         Spear,
         Club
     }
 
-    public enum Rarity
+    public enum Rarity : byte
     {
         Undetermined,
         Common,
@@ -115,7 +115,7 @@ public class Weapon : MonoBehaviour
             knockbackDirection = -other.contacts[0].normal;
 
 
-            if (enemyRB && !lingeringClash && (!Owner || Owner.CurrentWeapon != this))
+            if (enemyRB && !lingeringClash && (!Owner || Owner.WeaponElements.CurrentWeapon != this))
             {
                 // neutralize a bit before the big hit
 
@@ -169,12 +169,12 @@ public class Weapon : MonoBehaviour
 
 
                      //  print("Stabbed");
-                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().WeaponElements.CurrentWeapon != this)
                         {
-                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
-                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
-                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
-                                              RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                            damageable.UpdateHealth(-(BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1+Owner.BonusEffect.DamageSpeedMult)), knockbackDirection);
+                            SpawnDamageCanvas((BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1 + Owner.BonusEffect.DamageSpeedMult)),
                                 other.transform);
                         }
                     }
@@ -184,12 +184,12 @@ public class Weapon : MonoBehaviour
                     if (Type == WeaponType.Sword)
                     {
                        // print("Slashed");
-                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().WeaponElements.CurrentWeapon != this)
                         {
-                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
-                                                   RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
-                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
-                                             RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                            damageable.UpdateHealth(-(BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1 + Owner.BonusEffect.DamageSpeedMult)), knockbackDirection);
+                            SpawnDamageCanvas((BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1 + Owner.BonusEffect.DamageSpeedMult)),
                                other.transform);
                         }
                     }
@@ -197,19 +197,19 @@ public class Weapon : MonoBehaviour
                     {
                      //   print("Spear Slashed");
                         bonus = 0.5f;
-                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().WeaponElements.CurrentWeapon != this)
                         {
-                            damageable.UpdateHealth(-BaseWeaponDamage * bonus *
-                                                      RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
-                            SpawnDamageCanvas(BaseWeaponDamage * bonus *
-                                             RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier),
+                            damageable.UpdateHealth(-(BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1 + Owner.BonusEffect.DamageSpeedMult)), knockbackDirection);
+                            SpawnDamageCanvas((BaseWeaponDamage + Owner.BonusEffect.BaseDamage) * bonus *
+                                                    RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier * (1 + Owner.BonusEffect.DamageSpeedMult)),
                                other.transform);
                         }
                     }
                     else
                     {
                      //   print("Smashed");
-                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().CurrentWeapon != this)
+                        if (!other.gameObject.GetComponent<Character>() || other.gameObject.GetComponent<Character>().WeaponElements.CurrentWeapon != this)
                         {
                             damageable.UpdateHealth(-BaseWeaponDamage * bonus *
                                                     RB.mass * (Math.Abs(RB.linearVelocity.magnitude) * SpeedModifier), knockbackDirection);
@@ -412,26 +412,22 @@ public class Weapon : MonoBehaviour
 
 
 [Serializable]
-public class PassiveEffect
+public struct PassiveEffect
 {
+    public bool Activated;
     public float Percentage;
-
     // 0 = permanent
     public float Duration;
-
     public EffectType Type;
-
-    public bool Activated;
-
     public ActivationCondition Condition;
 
-    public enum ActivationCondition
+    public enum ActivationCondition : byte
     {
         Constant,
         WhileEquiped,
         WhileUnequiped
     }
-    public enum EffectType
+    public enum EffectType : byte
     {
         TBD,
         WeaponSize,

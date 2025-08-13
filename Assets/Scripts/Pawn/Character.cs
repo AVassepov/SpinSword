@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Character : Pawn
@@ -8,15 +9,11 @@ public class Character : Pawn
 
     [SerializeField] private GameObject healthBar;
     private UnityEngine.UI.Image healthBarImage;
-    
-    
-    public Transform WeaponAnchor;
 
 
-    public Transform WeaponTargetTransform;
-    
     [HideInInspector] public GameObject healthbarInstance;
-    public Weapon CurrentWeapon;
+
+    public WeaponElements WeaponElements;
   
 
     public void Start()
@@ -28,10 +25,10 @@ public class Character : Pawn
         healthBarImage = healthbarInstance.transform.GetChild(1).GetComponent<UnityEngine.UI.Image>();
         healthbarInstance.transform.parent = null;
 
-        if(CurrentWeapon != null)
+        if(WeaponElements.CurrentWeapon != null)
         {
-            CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
-            CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+            WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+            WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
         }
 
     }
@@ -47,8 +44,8 @@ public class Character : Pawn
         }else if (Health <= 0)
         {
             Destroy(healthbarInstance);
-            if (CurrentWeapon) {
-                CurrentWeapon.Drop();
+            if (WeaponElements.CurrentWeapon) {
+                WeaponElements.CurrentWeapon.Drop();
             }
             Die();
         }
@@ -64,11 +61,11 @@ public class Character : Pawn
 }
 
 [System.Serializable]
-public class BonusEffect
+public struct BonusEffect
 {
     public float WeaponSize;
     public float BaseDamage;
-    public float DamageSpeedMult = 1;
+    public float DamageSpeedMult;
     public float BonusDuration;
     public float SwingSpeed;
     public float MovementSpeed;
@@ -77,4 +74,12 @@ public class BonusEffect
     public float CoolDown;
     public float ApplyPoison;
     public float ApplyBleed;
+}
+
+[Serializable]
+public struct WeaponElements
+{
+    public Transform WeaponAnchor;
+    public Transform WeaponTargetTransform;
+    public Weapon CurrentWeapon;
 }

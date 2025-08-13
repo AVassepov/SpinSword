@@ -7,7 +7,10 @@ public class Room : MonoBehaviour
     public List<GameObject> Doors;
 
     [SerializeField] private GameObject[] Anchors;
-    [SerializeField] private List<GameObject>Encounters;
+    public List<GameObject>Encounters;
+
+
+   public Room[] neighbors = new Room[4]; 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void Awake()
@@ -43,6 +46,17 @@ public class Room : MonoBehaviour
         Anchors[index].gameObject.SetActive(false);
     }
     
+    public bool CheckAnchor(int index)
+    {
+        if (Anchors[index].activeSelf)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     
     
 }

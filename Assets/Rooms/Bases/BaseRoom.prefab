@@ -524,7 +524,7 @@ GameObject:
   - component: {fileID: 3488244093275993203}
   - component: {fileID: 4916724124708485}
   m_Layer: 0
-  m_Name: Door (1)
+  m_Name: Bottom Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -952,7 +952,7 @@ GameObject:
   - component: {fileID: 1572068778936875284}
   - component: {fileID: 8394785528194362944}
   m_Layer: 0
-  m_Name: Door
+  m_Name: Top Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1529,19 +1529,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Doors:
-  - {fileID: 5113474443669755412}
-  - {fileID: 7115704326297558679}
-  - {fileID: 7611646911666504122}
   - {fileID: 3716067737966260299}
+  - {fileID: 7611646911666504122}
+  - {fileID: 7115704326297558679}
+  - {fileID: 5113474443669755412}
   Anchors:
-  - {fileID: 7495203282332094450}
-  - {fileID: 1836784456531355645}
-  - {fileID: 3990240509750951912}
   - {fileID: 3394742460595660274}
+  - {fileID: 3990240509750951912}
+  - {fileID: 1836784456531355645}
+  - {fileID: 7495203282332094450}
   Encounters:
   - {fileID: 5929926180893161261, guid: b603cf8d264be2745a6cffdc87d7866a, type: 3}
   - {fileID: 5929926180893161261, guid: b603cf8d264be2745a6cffdc87d7866a, type: 3}
   - {fileID: 5929926180893161261, guid: b603cf8d264be2745a6cffdc87d7866a, type: 3}
+  neighbors:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!61 &1674633929557522036
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1601,7 +1606,7 @@ GameObject:
   - component: {fileID: 5057342776106677967}
   - component: {fileID: 8950944672002452072}
   m_Layer: 0
-  m_Name: Door (2)
+  m_Name: Left Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1839,7 +1844,7 @@ GameObject:
   - component: {fileID: 4237618642295489392}
   - component: {fileID: 4703614119756581876}
   m_Layer: 0
-  m_Name: Door (3)
+  m_Name: Right Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2308,10 +2313,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2955937572837276620}
   - {fileID: 6334697700160996622}
-  - {fileID: 2480414071718177062}
   - {fileID: 708271992866429412}
+  - {fileID: 2480414071718177062}
+  - {fileID: 2955937572837276620}
   m_Father: {fileID: 1780115877523323271}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9143317295662060837

@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,17 +13,25 @@ public class Encounter : MonoBehaviour
     public List<Transform> EnemySpawners;
 
 
+    [SerializeField] private GameObject Exit;
+
     private Player playerInstance;
 
     public List<Enemy> EnemyInstances = new List<Enemy>();
 
     public List<GameObject> Doors;
 
-
+    public bool IsBoss;
 
     private void Start()
     {
-        print(Doors.Count);
+
+        if (Enemies[0] is Boss)
+        {
+            IsBoss = true;
+        }
+
+
 
         List<GameObject> openDoors = new List<GameObject>(); 
 
@@ -41,6 +46,7 @@ public class Encounter : MonoBehaviour
         Doors = openDoors;
 
     }
+
 
     public void SpawnEnemies()
     {
@@ -86,6 +92,12 @@ public class Encounter : MonoBehaviour
         {
             Doors[i].SetActive(false);
         }
+
+        if (Exit!=null)
+        {
+            Instantiate(Exit, transform.position , Quaternion.identity);
+        }
+
     }
 
     public void OnTriggerEnter2D(Collider2D other)

@@ -70,7 +70,7 @@ public class Player : Character
 
         if(Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-          int newWeapon = EquippedWeapons.IndexOf(CurrentWeapon) + (int)Input.GetAxis("Mouse ScrollWheel");
+          int newWeapon = EquippedWeapons.IndexOf(WeaponElements.CurrentWeapon) + (int)Input.GetAxis("Mouse ScrollWheel");
 
 
             if (newWeapon < 0)
@@ -127,22 +127,22 @@ public class Player : Character
 
 
           // rb2d.linearVelocity = moveDirection * MovementSpeed;
-            rb2d.AddForce(moveDirection * MovementSpeed , ForceMode2D.Force);
+            rb2d.AddForce(moveDirection * (MovementSpeed + BonusEffect.MovementSpeed) , ForceMode2D.Force);
     }
 
     private void SwapWeapon(int weaponIndex)
     {
-        CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
-        CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
-        CurrentWeapon.gameObject.SetActive(false);
-        CurrentWeapon = EquippedWeapons[weaponIndex];
-        CurrentWeapon.gameObject.SetActive(true);
-        CurrentWeapon.transform.position = WeaponAnchor.transform.position;
-        CurrentWeapon.Target = WeaponTargetTransform;
-        CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
-        CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+        WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+        WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+        WeaponElements.CurrentWeapon.gameObject.SetActive(false);
+        WeaponElements.CurrentWeapon = EquippedWeapons[weaponIndex];
+        WeaponElements.CurrentWeapon.gameObject.SetActive(true);
+        WeaponElements.CurrentWeapon.transform.position = WeaponElements.WeaponAnchor.transform.position;
+        WeaponElements.CurrentWeapon.Target = WeaponElements.WeaponTargetTransform;
+        WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+        WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
 
-        CurrentWeapon.ActivateAllEffects( PassiveEffect.ActivationCondition.Constant);
+        WeaponElements.CurrentWeapon.ActivateAllEffects( PassiveEffect.ActivationCondition.Constant);
     }
 
 
@@ -151,7 +151,7 @@ public class Player : Character
     {
         if (other.gameObject.TryGetComponent(out WeaponUI UI))
         {
-            if(other.GetComponent<Weapon>() != CurrentWeapon){
+            if(other.GetComponent<Weapon>() != WeaponElements.CurrentWeapon){
                 UI.Setup();
                 weaponOnGround = UI.GetComponent<Weapon>();
             }
@@ -162,7 +162,7 @@ public class Player : Character
     {
         if (other.gameObject.TryGetComponent(out WeaponUI UI))
         {
-            if (other.GetComponent<Weapon>() != CurrentWeapon)
+            if (other.GetComponent<Weapon>() != WeaponElements.CurrentWeapon)
             {
                 UI.CloseUI();
                 weaponOnGround = null;
@@ -177,13 +177,13 @@ public class Player : Character
         // Make the weapon follow the anchor
         /*CurrentWeapon.GetComponent<Rigidbody2D>().MovePosition(WeaponAnchor.position);
         CurrentWeapon.GetComponent<Rigidbody2D>().MoveRotation(WeaponAnchor.rotation);*/
-        if (CurrentWeapon)
+        if (WeaponElements.CurrentWeapon)
         {
-            Vector2 weaponPosition = Vector2.Lerp( WeaponTargetTransform.position , WeaponAnchor.position , CurrentWeapon.MovementSpeed  );
-            Quaternion weaponRotation = Quaternion.Lerp(WeaponTargetTransform.rotation, WeaponAnchor.rotation, CurrentWeapon.RotationSpeed );
-            
-            WeaponTargetTransform.transform.position = weaponPosition;
-            WeaponTargetTransform.transform.rotation = weaponRotation;
+            Vector2 weaponPosition = Vector2.Lerp(WeaponElements.WeaponTargetTransform.position , WeaponElements.WeaponAnchor.position , WeaponElements.CurrentWeapon.MovementSpeed  );
+            Quaternion weaponRotation = Quaternion.Lerp(WeaponElements.WeaponTargetTransform.rotation, WeaponElements.WeaponAnchor.rotation, WeaponElements.CurrentWeapon.RotationSpeed );
+
+            WeaponElements.WeaponTargetTransform.transform.position = weaponPosition;
+            WeaponElements.WeaponTargetTransform.transform.rotation = weaponRotation;
         }
         
 
@@ -202,7 +202,7 @@ public class Player : Character
 
             if (MaximumWeaponSlots > EquippedWeapons.Count)
             {
-                weaponOnGround.PickUp(WeaponAnchor);
+                weaponOnGround.PickUp(WeaponElements.WeaponAnchor);
                 EquippedWeapons.Add(weaponOnGround);
                 SwapWeapon(EquippedWeapons.IndexOf(weaponOnGround));
                 weaponOnGround = null;
@@ -210,14 +210,14 @@ public class Player : Character
             else
             {
                 print("Tried to pickup");
-                CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.WhileEquiped);
-                CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.Constant);
-                CurrentWeapon.Drop();
-                CurrentWeapon = weaponOnGround;
-                weaponOnGround.PickUp(WeaponAnchor);
+                WeaponElements.CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.WhileEquiped);
+                WeaponElements.CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.Constant);
+                WeaponElements.CurrentWeapon.Drop();
+                WeaponElements.CurrentWeapon = weaponOnGround;
+                weaponOnGround.PickUp(WeaponElements.WeaponAnchor);
                 weaponOnGround = null;
-                CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
-                CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+                WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+                WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
 
 
             }
