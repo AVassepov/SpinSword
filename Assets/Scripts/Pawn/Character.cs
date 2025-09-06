@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class Character : Pawn
@@ -24,6 +25,12 @@ public class Character : Pawn
         
         healthBarImage = healthbarInstance.transform.GetChild(1).GetComponent<UnityEngine.UI.Image>();
         healthbarInstance.transform.parent = null;
+
+        if (healthbarInstance.transform.childCount>2)
+        {
+            TextMeshProUGUI textMeshProUGUI = healthbarInstance.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+            textMeshProUGUI.text = gameObject.name.Replace("(Clone)", "");
+        }
 
         if(WeaponElements.CurrentWeapon != null)
         {

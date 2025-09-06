@@ -21,7 +21,6 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] private List<Room> BottomRooms;
 
 
-    [SerializeField] private GameObject BossEncounter;
 
     [SerializeField] private List<Room> rooms = new List<Room>();
    private List<GameObject> blockRooms = new List<GameObject>();
@@ -93,7 +92,6 @@ public class LevelGenerator : MonoBehaviour
         print(room.name + " " + room.transform.position);
         room.Encounters.Clear();
         room.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red;
-
         CreateBossRoom(room);
        // FillInHoles();
     }

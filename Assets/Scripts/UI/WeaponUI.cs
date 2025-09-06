@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class WeaponUI : MonoBehaviour
 {
-   private Weapon weapon;
+   public Weapon Weapon;
 
+    [SerializeField] private bool IsCard;
 
    [SerializeField] private GameObject UI;
 
@@ -21,10 +22,16 @@ public class WeaponUI : MonoBehaviour
    private TextMeshProUGUI Knockback;
 
 
+    protected Transform UIChild;
+
+    [HideInInspector] public string Name;
+
    private void Awake()
    {
-      weapon = GetComponent<Weapon>();
-   }
+        if(GetComponent<Weapon>() != null) { 
+            Weapon = GetComponent<Weapon>();
+        }
+    }
 
 
    public void Setup()
@@ -33,29 +40,50 @@ public class WeaponUI : MonoBehaviour
       if(UIInstance){
          Destroy(UIInstance);
       }
-      
-      
-      
-      UIInstance = Instantiate(UI , transform.position+ new Vector3(0,5,0) , quaternion.identity);
-
-        Transform UIChild = UIInstance.transform.GetChild(0);
-
-      WeaponName = UIChild.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-      WeaponType = UIChild.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-      Damage = UIChild.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-      Weight = UIChild.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-      SwingSpeed = UIChild.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-      Knockback = UIChild.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
 
 
-      WeaponName.text = transform.name;
-      WeaponName.text.Replace("(Clone)", "");
-      WeaponType.text = weapon.Type.ToString();
-      Damage.text = weapon.BaseWeaponDamage.ToString();
-      Weight.text = GetComponentInChildren<Rigidbody2D>().mass.ToString();
-      SwingSpeed.text = weapon.MovementSpeed.ToString();
-      Knockback.text = weapon.KnockbackForce.ToString();
-   }
+        if (Weapon) {
+
+            if (!IsCard) { 
+            UIInstance = Instantiate(UI , transform.position+ new Vector3(0,5,0) , quaternion.identity);
+            }
+            else
+            {
+                UIInstance = Instantiate(UI, transform);
+                UIInstance.transform.SetSiblingIndex(1);
+            }
+
+
+            UIChild  = UIInstance.transform.GetChild(0);
+
+          WeaponName = UIChild.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+          WeaponType = UIChild.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+          Damage = UIChild.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+          Weight = UIChild.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+          SwingSpeed = UIChild.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+          Knockback = UIChild.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+
+            if (!IsCard) { 
+                WeaponName.text = transform.name;
+            }
+            else
+            {
+                WeaponName.text = Name;
+            }
+
+          WeaponName.text.Replace("(Clone)", "");
+          WeaponType.text = Weapon.Type.ToString();
+          Damage.text = Weapon.BaseWeaponDamage.ToString();
+          Weight.text = Weapon.gameObject.GetComponent<Rigidbody2D>().mass.ToString();
+          SwingSpeed.text = Weapon.MovementSpeed.ToString();
+          Knockback.text = Weapon.KnockbackForce.ToString();
+
+        }
+        else
+        {
+            print("NO WEAPON YOU STUPID");
+        }
+    }
 
 
    public void CloseUI()

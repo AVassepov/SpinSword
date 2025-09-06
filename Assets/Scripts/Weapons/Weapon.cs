@@ -19,9 +19,11 @@ public class Weapon : MonoBehaviour
     //public LineRenderer LineRenderer;
 
 
-    Vector3 knockbackDirection;
+    [SerializeField] private List<Weapon> collisionExceptions;
+
+    private Vector3 knockbackDirection;
     
-    private Rigidbody2D RB;
+    [HideInInspector]public Rigidbody2D RB;
     private WeaponUI UI;
 
     public WeaponType Type;
@@ -104,10 +106,8 @@ public class Weapon : MonoBehaviour
 
 
 
-        if (Target != null && DamagingColliders.Contains(other.otherCollider))
+        if (Target != null && DamagingColliders.Contains(other.otherCollider) && !collisionExceptions.Contains(other.gameObject.GetComponent<Weapon>()) )
         {
-            Owner = other.gameObject.GetComponent<Character>();
-
             Rigidbody2D enemyRB = other.gameObject.GetComponent<Rigidbody2D>();
 
 
@@ -124,7 +124,7 @@ public class Weapon : MonoBehaviour
                 Weapon weapon = other.gameObject.GetComponent<Weapon>();
 
 
-                if (weapon != null)
+                if (weapon != null && !collisionExceptions.Contains(weapon))
                 {
                     enemyRB.linearVelocity = Vector3.zero;
                     clashed = true;
@@ -148,7 +148,7 @@ public class Weapon : MonoBehaviour
             IDamageable damageable = other.gameObject.GetComponent<IDamageable>();
 
 
-            if (damageable != null && !recovering)
+            if (damageable != null && !recovering && damageable as Character != Owner)
             {
 
                 float bonus = 1;

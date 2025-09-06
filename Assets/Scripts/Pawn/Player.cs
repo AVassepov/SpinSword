@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class Player : Character
 {
      private Rigidbody2D rb2d;
@@ -11,7 +12,9 @@ public class Player : Character
     public float Stamina = 0; 
 
     private float maxStamina = 100;
-    
+
+
+    [SerializeField] private PauseMenu Pause;
     
     private bool sprinting = false;
 
@@ -19,11 +22,13 @@ public class Player : Character
     private float defaultSpeed;
 
 
+
+
     public List<Weapon> EquippedWeapons = new List<Weapon>();
 
     private int MaximumWeaponSlots = 3;
 
-
+    private Vector2 moveDir;
 
     private Weapon weaponOnGround;
     private void Awake()
@@ -40,13 +45,33 @@ public class Player : Character
     }
 
 
-    public void FixedUpdate()
-    { 
+    public override void UpdateHealth(float value, Vector3 direction)
+    {
+        Health += value;
+
+        if (Health > MaxHealth + BonusEffect.MaxHP)
+        {
+            Health = MaxHealth + BonusEffect.MaxHP;
+        }
+        else if (Health <= 0)
+        {
+            Die();
+        }
+
+
+        TakeHit(direction);
+
+
+
+    }
+    public void Update()
+    {
+        moveDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
+
+
        //Weapon movement and states 
         MouseUpdate();
-      
-        // Movement
-        Move(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
         
          // Sprinting
         if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -59,17 +84,18 @@ public class Player : Character
         
         if (Input.GetMouseButtonDown(1))
         {
-            Interact();
+            Interact(false);
         }
 
         int number = GetPressedNumber();
 
-        if (number > 0) {
+        if (number > 0 && number<= EquippedWeapons.Count && EquippedWeapons[number] !=null) {
             SwapWeapon(number-1);
         }
 
         if(Input.GetAxis("Mouse ScrollWheel") != 0)
         {
+            print("SCROLLING");
           int newWeapon = EquippedWeapons.IndexOf(WeaponElements.CurrentWeapon) + (int)Input.GetAxis("Mouse ScrollWheel");
 
 
@@ -91,12 +117,20 @@ public class Player : Character
         
     }
 
+    private void FixedUpdate()
+    {
+
+        // Movement
+        Move(moveDir);
+    }
+
     public int GetPressedNumber()
     {
         for (int number = 0; number <= 9; number++)
         {
-            if (Input.GetKeyDown(number.ToString()))
-                return number;
+            if (Input.GetKeyDown(number.ToString())) { 
+            return number;
+            }
         }
 
         return -1;
@@ -108,20 +142,20 @@ public class Player : Character
         if (sprinting && Stamina > 0   && (moveDirection.x != 0 || moveDirection.y != 0 ))
         {
             Stamina--;
-            MovementSpeed = SprintSpeed;
+            MovementSpeed = SprintSpeed + BonusEffect.MovementSpeed;
         }
         else if(!sprinting)
         {
-            MovementSpeed = defaultSpeed;
+            MovementSpeed = defaultSpeed + BonusEffect.MovementSpeed;
             Stamina++;
 
-            if (Stamina > maxStamina)
+            if (Stamina > maxStamina + BonusEffect.Stamina)
             {
-                Stamina = maxStamina;
+                Stamina = maxStamina + BonusEffect.Stamina;
             }
         }else if (sprinting && Stamina == 0)
         {
-            MovementSpeed = defaultSpeed;
+            MovementSpeed = defaultSpeed + BonusEffect.MovementSpeed;
         }
 
 
@@ -130,19 +164,23 @@ public class Player : Character
             rb2d.AddForce(moveDirection * (MovementSpeed + BonusEffect.MovementSpeed) , ForceMode2D.Force);
     }
 
-    private void SwapWeapon(int weaponIndex)
+    public void SwapWeapon(int weaponIndex)
     {
-        WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
-        WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
-        WeaponElements.CurrentWeapon.gameObject.SetActive(false);
-        WeaponElements.CurrentWeapon = EquippedWeapons[weaponIndex];
-        WeaponElements.CurrentWeapon.gameObject.SetActive(true);
-        WeaponElements.CurrentWeapon.transform.position = WeaponElements.WeaponAnchor.transform.position;
-        WeaponElements.CurrentWeapon.Target = WeaponElements.WeaponTargetTransform;
-        WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
-        WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
 
-        WeaponElements.CurrentWeapon.ActivateAllEffects( PassiveEffect.ActivationCondition.Constant);
+      // if (EquippedWeapons.Count>= weaponIndex && !EquippedWeapons[weaponIndex])
+        //{
+            WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+            WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+            WeaponElements.CurrentWeapon.gameObject.SetActive(false);
+            WeaponElements.CurrentWeapon = EquippedWeapons[weaponIndex];
+            WeaponElements.CurrentWeapon.gameObject.SetActive(true);
+            WeaponElements.CurrentWeapon.transform.position = WeaponElements.WeaponAnchor.transform.position;
+            WeaponElements.CurrentWeapon.Target = WeaponElements.WeaponTargetTransform;
+            WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+            WeaponElements.CurrentWeapon.ClearAllEffects(PassiveEffect.ActivationCondition.WhileUnequiped);
+
+            WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
+        //}
     }
 
 
@@ -194,21 +232,22 @@ public class Player : Character
         transform.up = direction;
     }
 
-    void Interact()
+    public void Interact(bool swap)
     {
 
         if (weaponOnGround)
         {
 
-            if (MaximumWeaponSlots > EquippedWeapons.Count)
+            if (MaximumWeaponSlots >= EquippedWeapons.Count)
             {
                 weaponOnGround.PickUp(WeaponElements.WeaponAnchor);
                 EquippedWeapons.Add(weaponOnGround);
                 SwapWeapon(EquippedWeapons.IndexOf(weaponOnGround));
                 weaponOnGround = null;
             }
-            else
+            else if(swap)
             {
+                EquippedWeapons[Pause.CurrentCardIndex] = weaponOnGround;
                 print("Tried to pickup");
                 WeaponElements.CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.WhileEquiped);
                 WeaponElements.CurrentWeapon.ClearAllEffects( PassiveEffect.ActivationCondition.Constant);
@@ -218,8 +257,12 @@ public class Player : Character
                 weaponOnGround = null;
                 WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.Constant);
                 WeaponElements.CurrentWeapon.ActivateAllEffects(PassiveEffect.ActivationCondition.WhileEquiped);
+                Pause.ToggleUI(false);
 
-
+            }
+            else
+            {
+                Pause.ToggleUI(true);
             }
         }
         

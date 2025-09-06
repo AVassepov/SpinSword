@@ -21,6 +21,8 @@ public class Encounter : MonoBehaviour
 
     public List<GameObject> Doors;
 
+    
+
     public bool IsBoss;
 
     private void Start()

@@ -366,7 +366,8 @@ MonoBehaviour:
   - {fileID: 980129419076772183}
   - {fileID: 7709954231783952489}
   - {fileID: 3473668447952314443}
-  Encounters: []
+  Encounters:
+  - {fileID: 5929926180893161261, guid: 3799df760c6f33c439bc94e2efc931f7, type: 3}
   neighbors:
   - {fileID: 0}
   - {fileID: 0}
@@ -389,6 +390,7 @@ MonoBehaviour:
   - {fileID: 6795690055347849377, guid: 9fbc76b7dc6ef4d4d858eb3e134c3b78, type: 3}
   EnemySpawners:
   - {fileID: 5165045356803703890}
+  Exit: {fileID: 8204220893218859201, guid: 940b5b6a056c96048b717757bbad7649, type: 3}
   EnemyInstances: []
   Doors:
   - {fileID: 4112723426389085522}

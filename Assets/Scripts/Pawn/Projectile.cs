@@ -15,6 +15,7 @@ public class Projectile : Pawn
 
     [SerializeField] private float Damage = 10;
     public Vector3 TargetPosition;
+    public float Velocity;
     
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class Projectile : Pawn
 
         if (TargetPosition != Vector3.zero)
         {
-            rb.linearVelocity = TargetPosition * 10;
+            rb.linearVelocity = TargetPosition * Velocity;
         }
     }
 

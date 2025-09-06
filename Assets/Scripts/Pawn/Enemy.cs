@@ -1,12 +1,16 @@
+using NUnit.Framework;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : Character
 {
-    
-    
-    private NavMeshAgent agent;
+    [SerializeField] private Transform FollowAnchor;
+
+
+    protected NavMeshAgent agent;
 
     public Encounter Encounter;
 
@@ -15,6 +19,9 @@ public class Enemy : Character
     [SerializeField]private Behaviour enemyBehaviour;
 
     [SerializeField] private GameObject ProjectilePrefab;
+
+    [SerializeField] protected List<Transform> ShootingOrigins;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -31,7 +38,7 @@ public class Enemy : Character
           Weapon.transform.parent = null;
           }*/
         WeaponElements.CurrentWeapon.Target = WeaponElements.WeaponTargetTransform;
-        WeaponElements.WeaponTargetTransform.transform.parent = null;
+        WeaponElements.WeaponTargetTransform.parent = null;
         WeaponElements.CurrentWeapon.transform.parent = null;
     }
 
@@ -49,19 +56,22 @@ public class Enemy : Character
             transform.Rotate(new Vector3(0, 0, -5));
             agent.SetDestination(Player.transform.position);
         }
-         
-        
-        healthbarInstance.transform.position = gameObject.transform.position;
-        
-        
-        if(WeaponElements.WeaponTargetTransform){
-            Vector2 weaponPosition = Vector2.Lerp(WeaponElements.WeaponTargetTransform.position , WeaponElements.WeaponAnchor.position , WeaponElements.CurrentWeapon.RotationSpeed  );
-            Quaternion weaponRotation = Quaternion.Lerp(WeaponElements.WeaponTargetTransform.rotation, WeaponElements.WeaponAnchor.rotation, WeaponElements.CurrentWeapon.RotationSpeed );
 
-            WeaponElements.WeaponTargetTransform.transform.position = weaponPosition;
-            WeaponElements.WeaponTargetTransform.transform.rotation = weaponRotation;
+        if (healthbarInstance) { 
+            healthbarInstance.transform.position = gameObject.transform.position;
         }
+        MoveWeapon();
+        EnemyLogic();
     }
+
+
+    public virtual void EnemyLogic()
+    {
+        // write logic in child classes
+    }
+
+
+
     public override void Die()
     {
         if (Encounter != null)
@@ -71,14 +81,42 @@ public class Enemy : Character
         Destroy(gameObject);
     }
 
+
+    public virtual void MoveWeapon()
+    {
+        if (WeaponElements.WeaponTargetTransform)
+        {
+            Vector2 weaponPosition = Vector2.Lerp(WeaponElements.WeaponTargetTransform.position, WeaponElements.WeaponAnchor.position, WeaponElements.CurrentWeapon.RotationSpeed);
+            Quaternion weaponRotation = Quaternion.Lerp(WeaponElements.WeaponTargetTransform.rotation, WeaponElements.WeaponAnchor.rotation, WeaponElements.CurrentWeapon.RotationSpeed);
+
+            WeaponElements.WeaponTargetTransform.transform.position = weaponPosition;
+            WeaponElements.WeaponTargetTransform.transform.rotation = weaponRotation;
+        }
+    }
+
+    public IEnumerator DelayedShot(float delay , Vector3 dir, float damage, Vector3 origin, float velocity, int projectileLive)
+    {
+
+        yield return new WaitForSeconds(delay);
+        ShootProjectile( dir,  damage,  origin,  velocity,  projectileLive);
     
+    }
     public void ShootProjectile(Vector3 dir, float damage, Vector3 origin, float velocity, int projectileLives)
     {
 
         Projectile projectile = Instantiate(ProjectilePrefab , origin, Quaternion.identity).GetComponent<Projectile>();
 
 
+        projectile.Velocity = velocity;
 
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, dir);
+
+
+
+
+
+        projectile.TargetPosition = hit.point;
     }
 
     /// <summary>
